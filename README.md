@@ -185,22 +185,28 @@ These steps summarise how to start experiments during the PPSN 2016 tutorial:
 2.  Open a terminal (T1) and type 
 
     git clone https://github.com/ci-group/NEATThymio.git
+    
     (for mac, install xcode-select --install  (error: xcrun error))
 
 3.  Connect to ThymioNet (password: 172luckytulip75B)
 4.  In T1 modify the bots file by correcting the IP address and send the files to the robot:
 
     nano NEATThymio/src/bots.txt 
+    
     cd NEATThymio/src
+    
     sh ./sync_all.sh 
+    
     type “yes” and use the password raspberry (multiple times)
 
 5.  Open a new terminal (T2) and login to the robot
 
     ssh pi@192.168.1.y (where y= pi address)
+    
     password: raspberry
 
-6.  Start an experiment with the command:
+6.  Start an experiment with the command:
+
     sh ./start_one.sh obstacle_avoidance.py 192.168.1.y GO
 
 7. To stop the robot use T1 and type 
