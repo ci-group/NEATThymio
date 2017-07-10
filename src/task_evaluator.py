@@ -59,7 +59,7 @@ class TaskEvaluator:
         self.loop.run()
 
         fitness = max(self.fitness, 1)
-        print 'Fitness at end: %d' % fitness
+        print 'Fitness at end in task eval: %d' % fitness
 
         # self.thymioController.SendEventName('PlayFreq', [700, 0], reply_handler=dbusReply, error_handler=dbusError)
         # time.sleep(.3)

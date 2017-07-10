@@ -444,6 +444,8 @@ class NEATPopulation(SimplePopulation):
         self.stagnation_age = stagnation_age
         self.min_elitism_size = min_elitism_size
         self.logger = Logger()
+        self.population_backup = self.population
+        self.species_backup = []
 
 
     def _reset(self):
@@ -466,7 +468,13 @@ class NEATPopulation(SimplePopulation):
         for specie in self.species:
             for member in specie.members:
                 yield member
-        
+
+    def giveBackUp(self):
+        return self.population_backup
+    
+    def giveBackUpSpecies(self):
+        return self.species_backup
+    
     def _evolve(self, evaluator, solution=None):
         """ A single evolutionary step .
         """
@@ -480,7 +488,12 @@ class NEATPopulation(SimplePopulation):
             
         ## EVALUATE 
         pop = self._evaluate_all(pop, evaluator)
-                
+    
+        ## SAVE POPULATION AND CONNECTIONS
+        
+        self.population_backup = pop
+        self.species_backup = self.species
+    
         ## SPECIATE
         # Select random representatives
         for specie in self.species:
@@ -578,18 +591,22 @@ class NEATPopulation(SimplePopulation):
         
         if self.innovations:
             self.global_innov = max(self.innovations.itervalues())            
-        
+
+
         self._gather_stats(pop)
+
         
     def _status_report(self):
         """ Print a status report """
         """ Prints a status report """
         print "\n== Generation %d ==" % self.generation
-        print "Best (%.2f): %s %s" % (self.champions[-1].stats['fitness'], self.champions[-1], self.champions[-1].stats)
-        print "Solved: %s" % (self.solved_at)
-        print "Species: %s" % ([len(s.members) for s in self.species]) 
-        print "Age: %s" % ([s.age for s in self.species])
-        print "No improvement: %s" % ([s.no_improvement_age for s in self.species])
+        
+        for specie in self.species:
+            print "Best (%.2f): %s %s" % (self.champions[-1].stats['fitness'], self.champions[-1], self.champions[-1].stats)
+            print "Solved: %s" % (self.solved_at)
+            print "Species: %s" % ([len(s.members) for s in self.species])
+            print "Age: %s" % ([s.age for s in self.species])
+            print "No improvement: %s" % ([s.no_improvement_age for s in self.species])
 
         self.logger.info("== Generation %d ==" % self.generation)
         self.logger.info("Best (%.2f): %s %s" % (self.champions[-1].stats['fitness'], self.champions[-1], self.champions[-1].stats))

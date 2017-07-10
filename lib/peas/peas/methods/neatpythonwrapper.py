@@ -121,6 +121,7 @@ class NEATPythonPopulation(object):
             """
             for individual in population:
                 individual.fitness = evaluator(individual)
+            
             return [individual.fitness for individual in population]
         
         population.Population.evaluate = evaluate_all

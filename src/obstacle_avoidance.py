@@ -25,7 +25,7 @@ POPSIZE = 10
 GENERATIONS = 30
 TARGET_SPECIES = 2
 SOLVED_AT = EVALUATIONS * 2
-EXPERIMENT_NAME = 'NEAT_obstacle_avoidance_3_arena_0'
+EXPERIMENT_NAME = 'NEAT_correct_logging'
 
 CURRENT_FILE_PATH = os.path.abspath(os.path.dirname(__file__))
 MAIN_LOG_PATH = os.path.join(CURRENT_FILE_PATH, 'log_main')
@@ -52,7 +52,7 @@ class ObstacleAvoidance(TaskEvaluator):
             self.ctrl_thread_started = True
 
         return TaskEvaluator.evaluate(self, evaluee)
-
+            
     def _step(self, evaluee, callback):
         def ok_call(psValues):
             psValues = np.array([psValues[0], psValues[2], psValues[4], psValues[5], psValues[6], 1],dtype='f')
@@ -186,19 +186,26 @@ if __name__ == '__main__':
     thread.start_new_thread(set_client, ())
     
     def epoch_callback(population):
+        population_backup = population.giveBackUp()
+        species_backup = population.giveBackUpSpecies()
         generation = { 'individuals': [], 'gen_number': population.generation }
-        for individual in population.population:
+        for individual in population_backup:
             copied_connections = { str(key): value for key, value in individual.conn_genes.items() }
             generation['individuals'].append({
                 'node_genes': deepcopy(individual.node_genes),
                 'conn_genes': copied_connections,
                 'stats': deepcopy(individual.stats)
             })
+        
+        
         #champion_file = task.experimentName + '_{}_{}.p'.format(commit_sha, population.generation)
         #generation['champion_file'] = champion_file
-        generation['species'] = [len(species.members) for species in population.species]
+        generation['species'] = [len(species.members) for species in species_backup]
         log['generations'].append(generation)
-        task.getLogger().info(', '.join([str(ind.stats['fitness']) for ind in population.population]))
+        
+        print "fitnesses in obs avoidance %s" % [ind.stats['fitness'] for ind in population_backup]
+
+        task.getLogger().info(', '.join([str(ind.stats['fitness']) for ind in population_backup]))
         jsonLog = open(task.jsonLogFilename, "w")
         json.dump(log, jsonLog)
         jsonLog.close()
