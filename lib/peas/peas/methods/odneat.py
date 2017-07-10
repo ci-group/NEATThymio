@@ -509,6 +509,8 @@ class NEATPopulation(SimplePopulation):
         self.logger = Logger()
         self.distributor = Distributor(self.ip_address, self.logger)
         self.distributor.start()
+        self.population_backup = self.population
+        self.species_backup = []
 
 
     def _reset(self):
@@ -531,6 +533,13 @@ class NEATPopulation(SimplePopulation):
         for specie in self.species:
             for member in specie.members:
                 yield member
+
+
+    def giveBackUp(self):
+        return self.population_backup
+
+    def giveBackUpSpecies(self):
+        return self.species_backup
         
     def _evolve(self, evaluator, solution=None):
         """ A single evolutionary step .
@@ -552,7 +561,12 @@ class NEATPopulation(SimplePopulation):
             
         ## EVALUATE 
         pop = self._evaluate_all(pop, evaluator)
-                
+
+
+
+        self.population_backup = pop
+        self.species_backup = self.species
+
         ## SPECIATE
         # Select random representatives
         for specie in self.species:
