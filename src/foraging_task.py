@@ -329,8 +329,10 @@ if __name__ == '__main__':
 
     def epoch_callback(population):
         # update log
+        population_backup = population.giveBackUp()
+        species_backup = population.giveBackUpSpecies()
         generation = { 'individuals': [], 'gen_number': population.generation }
-        for individual in population.population:
+        for individual in population_backup:
             copied_connections = { str(key): value for key, value in individual.conn_genes.items() }
             generation['individuals'].append({
                 'node_genes': deepcopy(individual.node_genes),
@@ -339,7 +341,7 @@ if __name__ == '__main__':
             })
         champion_file = task.experimentName + '_{}_{}.p'.format(commit_sha, population.generation)
         generation['champion_file'] = champion_file
-        generation['species'] = [len(species.members) for species in population.species]
+        generation['species'] = [len(species.members) for species in species_backup]
         print generation['species']
         log['generations'].append(generation)
 
@@ -348,7 +350,7 @@ if __name__ == '__main__':
         json.dump(log, jsonLog)
         jsonLog.close()
 
-        current_champ = population.champions[-1]
+        current_champ = population_backup[-1]
         # print 'Champion: ' + str(current_champ.get_network_data())
         # current_champ.visualize(os.path.join(CURRENT_FILE_PATH, 'img/' + task.experimentName + '_%d.jpg' % population.generation))
         pickle.dump(current_champ, file(os.path.join(PICKLED_DIR, champion_file), 'w'))

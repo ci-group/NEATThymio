@@ -213,8 +213,10 @@ if __name__ == '__main__':
     thread.start_new_thread(set_client, ())
     
     def epoch_callback(population):
+        population_backup = population.giveBackUp()
+        species_backup = population.giveBackUpSpecies()
         generation = { 'individuals': [], 'gen_number': population.generation }
-        for individual in population.population:
+        for individual in population_backup:
             copied_connections = { str(key): value for key, value in individual.conn_genes.items() }
             generation['individuals'].append({
                 'node_genes': deepcopy(individual.node_genes),
@@ -223,9 +225,9 @@ if __name__ == '__main__':
             })
         #champion_file = task.experimentName + '_{}_{}.p'.format(commit_sha, population.generation)
         #generation['champion_file'] = champion_file
-        generation['species'] = [len(species.members) for species in population.species]
+        generation['species'] = [len(species.members) for species in species_backup]
         log['generations'].append(generation)
-        task.getLogger().info(', '.join([str(ind.stats['fitness']) for ind in population.population]))
+        task.getLogger().info(', '.join([str(ind.stats['fitness']) for ind in population_backup]))
         task.getLogger().info('hit the wall: ', task.hitWallCounter, ' times')
         task.hitWallCounter = 0
         jsonLog = open(task.jsonLogFilename, "w")
